@@ -1,0 +1,25 @@
+{
+  "name": "git-work-commit",
+  "displayName": "Git Work Commit",
+  "description": "Custom Git Work Commit button",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+"activationEvents": [
+  "onCommand:extension.gitWorkCommit",
+  "onFileSystem:file"
+],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [{
+      "command": "extension.gitWorkCommit",
+      "title": "Git Work Commit"s
+    }]
+  },
+
+  "publisher": "Muhammed Yusufs"
+}
