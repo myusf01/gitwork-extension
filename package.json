@@ -15,11 +15,14 @@
 ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
+    "commands": [{  
       "command": "extension.gitWorkCommit",
       "title": "Git Work Commit"
     }]
   },
-
-  "publisher": "Muhammed Yusufs"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/myusf01/gitwork-extension.git"
+  },
+  "publisher": "Muhammed Yusuf"
 }
