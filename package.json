@@ -2,7 +2,7 @@
   "name": "git-work-commit",
   "displayName": "Git Work Commit",
   "description": "Custom Git Work Commit button",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.60.0"
   },
