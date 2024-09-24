@@ -9,6 +9,9 @@
   "categories": [
     "Other"
   ],
+  "scripts": {
+  "build": "vsce package"
+},
 "activationEvents": [
   "onCommand:extension.gitWorkCommit",
   "onFileSystem:file"
