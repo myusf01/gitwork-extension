@@ -3,19 +3,19 @@ name: Build and Release
 on:
   push:
     branches:
-      - main  # or your default branch name
+      - main
     tags:
       - 'v*'
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '20'
         
@@ -23,16 +23,17 @@ jobs:
       run: npm ci
       
     - name: Install vsce
-      run: npm install -g vsce
+      run: npm install -g @vscode/vsce
       
     - name: Build VSIX
       run: vsce package
       
     - name: Upload VSIX as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: extension
         path: '*.vsix'
+        retention-days: 5
 
   release:
     needs: build
@@ -40,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download VSIX artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: extension
         

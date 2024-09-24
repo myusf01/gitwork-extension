@@ -10,12 +10,12 @@
     "Other"
   ],
   "scripts": {
-  "build": "vsce package"
-},
-"activationEvents": [
-  "onCommand:extension.gitWorkCommit",
-  "onFileSystem:file"
-],
+    "build": "vsce package --no-yarn"
+  },
+  "activationEvents": [
+    "onCommand:extension.gitWorkCommit",
+    "onFileSystem:file"
+  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [{  
@@ -26,6 +26,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/myusf01/gitwork-extension.git"
-  },
-  "publisher": "Muhammed Yusuf"
+  }
 }
