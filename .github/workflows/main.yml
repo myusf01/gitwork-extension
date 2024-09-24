@@ -42,6 +42,8 @@ jobs:
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - name: Download VSIX artifact
       uses: actions/download-artifact@v4
@@ -51,26 +53,13 @@ jobs:
     - name: Display structure of downloaded files
       run: ls -R
         
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Release
+      uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-        
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./git-work-commit-${{ github.ref_name }}.vsix
-        asset_name: git-work-commit-${{ github.ref_name }}.vsix
-        asset_content_type: application/octet-stream
+        files: |
+          *.vsix
+        fail_on_unmatched_files: true
+        generate_release_notes: true
 
     - name: Debug Release
       run: |
