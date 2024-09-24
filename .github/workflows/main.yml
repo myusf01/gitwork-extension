@@ -26,7 +26,10 @@ jobs:
       run: npm install -g @vscode/vsce
       
     - name: Build VSIX
-      run: vsce package
+      run: |
+        vsce package --no-yarn
+        echo "VSIX files in directory:"
+        ls *.vsix
       
     - name: Upload VSIX as artifact
       uses: actions/upload-artifact@v4
@@ -44,6 +47,9 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: extension
+        
+    - name: Display structure of downloaded files
+      run: ls -R
         
     - name: Create Release
       id: create_release
@@ -65,3 +71,10 @@ jobs:
         asset_path: ./git-work-commit-${{ github.ref_name }}.vsix
         asset_name: git-work-commit-${{ github.ref_name }}.vsix
         asset_content_type: application/octet-stream
+
+    - name: Debug Release
+      run: |
+        echo "GITHUB_REF: ${{ github.ref }}"
+        echo "GITHUB_REF_NAME: ${{ github.ref_name }}"
+        echo "Files in current directory:"
+        ls -l
