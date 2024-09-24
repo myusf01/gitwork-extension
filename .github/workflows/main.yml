@@ -2,8 +2,11 @@ name: Build and Release
 
 on:
   push:
+    branches:
+      - main  # or your default branch name
     tags:
       - 'v*'
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   build:
@@ -25,6 +28,22 @@ jobs:
     - name: Build VSIX
       run: vsce package
       
+    - name: Upload VSIX as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: extension
+        path: '*.vsix'
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download VSIX artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: extension
+        
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
