@@ -198,6 +198,7 @@ async function performWorkCommit() {
                 label: '$(git-branch) ' + name.replace('alias.', ''),
                 description: 'Existing alias'
             })),
+            { kind: vscode.QuickPickItemKind.Separator, label: 'Options' },
             {
                 label: '$(add) Create new alias',
                 description: 'Set up a new Git alias',
