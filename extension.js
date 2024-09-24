@@ -159,7 +159,7 @@ async function createGitAlias() {
         }
 
         fs.writeFileSync(gitConfigPath, configContent);
-        vscode.window.showInformationMessage(`Git alias '${aliasName}' created successfully!`);
+        vscode.window.showInformationMessage(`Git alias '${aliasName}' created successfullyy!`);
         return aliasName;
     } catch (error) {
         vscode.window.showErrorMessage(`Error creating Git alias: ${error.message}`);
