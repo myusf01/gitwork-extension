@@ -166,7 +166,23 @@ async function createGitAlias() {
         return null;
     }
 }
+/**
+ * Edits the default commit message in the user settings.
+ */
+async function editDefaultCommitMessage() {
+    const config = vscode.workspace.getConfiguration('gitWorkCommit');
+    const currentDefault = config.get('defaultCommitMessage', 'Work in progress');
 
+    const newDefault = await vscode.window.showInputBox({
+        prompt: 'Enter new default commit message',
+        value: currentDefault,
+    });
+
+    if (newDefault !== undefined) {
+        await config.update('defaultCommitMessage', newDefault, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`Default commit message updated to: "${newDefault}"`);
+    }
+}
 /**
  * Performs the Work Commit process.
  * This function handles alias selection, commit message input, and commit creation.
@@ -185,13 +201,16 @@ async function performWorkCommit() {
             {
                 label: '$(add) Create new alias',
                 description: 'Set up a new Git alias',
-                picked: true
+            },
+            {
+                label: '$(edit) Edit default commit message',
+                description: 'Change the default commit message',
             }
         ];
 
         // Show quick pick for alias selection
         let selectedChoice = await vscode.window.showQuickPick(choices, {
-            placeHolder: 'Select a Git profile alias or create a new one'
+            placeHolder: 'Select a Git profile alias, create a new one, or edit default message'
         });
 
         if (!selectedChoice) {
@@ -208,6 +227,11 @@ async function performWorkCommit() {
                 updateStatusBarItem();
                 return vscode.window.showInformationMessage('Alias creation cancelled');
             }
+        } else if (selectedChoice.label === '$(edit) Edit default commit message') {
+            await editDefaultCommitMessage();
+            isWorkCommitMode = false;
+            updateStatusBarItem();
+            return;
         } else {
             selectedAlias = selectedChoice.label.replace('$(git-branch) ', '');
         }
