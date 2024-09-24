@@ -3,19 +3,29 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+// Status bar items
 let myStatusBarItem;
 let isWorkCommitMode = false;
 let aliasStatusBarItem;
 
+/**
+ * Activates the extension.
+ * This function is called when the extension is activated.
+ * It sets up commands, status bar items, and initializes the extension.
+ * @param {vscode.ExtensionContext} context - The extension context
+ */
 function activate(context) {
     console.log('Git Work Commit extension is now active');
 
+    // Register the main command to toggle Work Commit mode
     let disposable = vscode.commands.registerCommand('extension.gitWorkCommit', toggleWorkCommit);
     context.subscriptions.push(disposable);
 
+    // Register the command to create a new Git alias
     let createAliasDisposable = vscode.commands.registerCommand('extension.createGitAlias', createGitAlias);
     context.subscriptions.push(createAliasDisposable);
 
+    // Create and set up the status bar item
     myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
     myStatusBarItem.command = 'extension.gitWorkCommit';
     context.subscriptions.push(myStatusBarItem);
@@ -23,6 +33,10 @@ function activate(context) {
     updateStatusBarItem();
 }
 
+/**
+ * Toggles the Work Commit mode on and off.
+ * This function is called when the user clicks on the status bar item.
+ */
 function toggleWorkCommit() {
     isWorkCommitMode = !isWorkCommitMode;
     updateStatusBarItem();
@@ -34,6 +48,10 @@ function toggleWorkCommit() {
     }
 }
 
+/**
+ * Updates the status bar item based on the current Work Commit mode.
+ * This function changes the text and appearance of the status bar item.
+ */
 function updateStatusBarItem() {
     if (isWorkCommitMode) {
         myStatusBarItem.text = '$(stop) Stop Work Commit';
@@ -46,6 +64,12 @@ function updateStatusBarItem() {
     }
     myStatusBarItem.show();
 }
+
+/**
+ * Parses the content of the .gitconfig file.
+ * @param {string} content - The content of the .gitconfig file
+ * @returns {Object} An object containing the parsed Git aliases
+ */
 function parseGitConfig(content) {
     const profiles = {};
     let currentSection = null;
@@ -65,6 +89,10 @@ function parseGitConfig(content) {
     return profiles;
 }
 
+/**
+ * Reads and parses the Git config file to get existing aliases.
+ * @returns {Object} An object containing the Git aliases
+ */
 function getGitProfiles() {
     const gitconfigPath = path.join(os.homedir(), '.gitconfig');
 
@@ -76,7 +104,14 @@ function getGitProfiles() {
         return {};
     }
 }
+
+/**
+ * Creates a new Git alias.
+ * This function prompts the user for alias details and adds it to the .gitconfig file.
+ * @returns {string|null} The name of the created alias, or null if creation was cancelled
+ */
 async function createGitAlias() {
+    // Prompt for alias name
     const aliasName = await vscode.window.showInputBox({
         prompt: 'Enter the alias name (e.g., sideproject)',
         validateInput: text => {
@@ -86,6 +121,7 @@ async function createGitAlias() {
 
     if (!aliasName) return null;
 
+    // Prompt for user name
     const userName = await vscode.window.showInputBox({
         prompt: 'Enter the user name for this alias',
         validateInput: text => {
@@ -95,6 +131,7 @@ async function createGitAlias() {
 
     if (!userName) return null;
 
+    // Prompt for user email
     const userEmail = await vscode.window.showInputBox({
         prompt: 'Enter the user email for this alias',
         validateInput: text => {
@@ -111,6 +148,7 @@ async function createGitAlias() {
         const aliasSection = '[alias]\n';
         const newAlias = `    ${aliasName} = !git -c user.name='${userName}' -c user.email='${userEmail}'\n`;
 
+        // Add the new alias to the .gitconfig file
         if (configContent.includes('[alias]')) {
             // If [alias] section exists, append to it
             const aliasIndex = configContent.indexOf('[alias]');
@@ -128,12 +166,17 @@ async function createGitAlias() {
         return null;
     }
 }
+
+/**
+ * Performs the Work Commit process.
+ * This function handles alias selection, commit message input, and commit creation.
+ */
 async function performWorkCommit() {
     try {
         const profiles = getGitProfiles();
         const profileNames = Object.keys(profiles).filter(name => name.startsWith('alias.'));
 
-        // Add icons to existing aliases and create new alias option
+        // Prepare choices for alias selection
         const choices = [
             ...profileNames.map(name => ({
                 label: '$(git-branch) ' + name.replace('alias.', ''),
@@ -146,6 +189,7 @@ async function performWorkCommit() {
             }
         ];
 
+        // Show quick pick for alias selection
         let selectedChoice = await vscode.window.showQuickPick(choices, {
             placeHolder: 'Select a Git profile alias or create a new one'
         });
@@ -168,6 +212,7 @@ async function performWorkCommit() {
             selectedAlias = selectedChoice.label.replace('$(git-branch) ', '');
         }
 
+        // Get commit message
         const config = vscode.workspace.getConfiguration('gitWorkCommit');
         const commitMessage = await vscode.window.showInputBox({
             prompt: 'Enter commit message',
@@ -175,8 +220,8 @@ async function performWorkCommit() {
         });
 
         if (commitMessage) {
+            // Create and execute the commit command
             const terminal = vscode.window.createTerminal('Git Work Commit');
-
             terminal.sendText(`git ${selectedAlias} commit --allow-empty -m "${commitMessage}"`);
             terminal.show();
 
@@ -192,6 +237,10 @@ async function performWorkCommit() {
     }
 }
 
+/**
+ * Deactivates the extension.
+ * This function is called when the extension is deactivated.
+ */
 function deactivate() { }
 
 module.exports = {
